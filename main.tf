@@ -14,8 +14,8 @@ provider "aws" {
 }
 
 # Define a VPC
-resource "aws_vpc" "main"{
-  cidr_block = "10.0.0.0/16"
+resource "aws_vpc" "main" {
+  cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
   tags = {
     "Name" = "main-vpc"
@@ -24,8 +24,8 @@ resource "aws_vpc" "main"{
 
 # Define a public subnet
 resource "aws_subnet" "public-subnet" {
-  vpc_id = "${aws_vpc.main.id}"
-  cidr_block = "10.0.1.0/24"
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.1.0/24"
   availability_zone = "us-east-1b"
 
   tags = {
@@ -34,9 +34,9 @@ resource "aws_subnet" "public-subnet" {
 }
 
 # Define a private subnet
-resource "aws_subnet" "public-subnet" {
-  vpc_id = "${aws_vpc.main.id}"
-  cidr_block = ""
+resource "aws_subnet" "private-subnet" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.2.0/24"
   availability_zone = "us-east-1c"
 
   tags = {
@@ -46,7 +46,7 @@ resource "aws_subnet" "public-subnet" {
 
 # Define the internet gateway
 resource "aws_internet_gateway" "igw" {
-  vpc_id = "${aws_vpc.default.id}"
+  vpc_id = aws_vpc.main.id
 
   tags = {
     Name = "VPC IGW"
@@ -55,11 +55,11 @@ resource "aws_internet_gateway" "igw" {
 
 # Define the route table for the public subnet
 resource "aws_route_table" "web-public-rt" {
-  vpc_id = "${aws_vpc.default.id}"
+  vpc_id = aws_vpc.main.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = "${aws_internet_gateway.igw.id}"
+    gateway_id = aws_internet_gateway.igw.id
   }
 
   tags = {
@@ -69,50 +69,50 @@ resource "aws_route_table" "web-public-rt" {
 
 # Assign the route table to the public subnet
 resource "aws_route_table_association" "web-public-rt" {
-  subnet_id = "${aws_subnet.public-subnet.id}"
-  route_table_id = "${aws_route_table.web-public-rt.id}"
+  subnet_id      = aws_subnet.public-subnet.id
+  route_table_id = aws_route_table.web-public-rt.id
 }
 
 # Define the security group for public subnet
 resource "aws_security_group" "sg-web" {
-  name = "sg_web_server"
+  name        = "sg_web_server"
   description = "Allow incoming HTTP connections & SSH access"
 
   ingress {
-    from_port = 80
-    to_port = 80
-    protocol = "tcp"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    from_port = 443
-    to_port = 443
-    protocol = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    from_port = -1
-    to_port = -1
-    protocol = "icmp"
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
-    cidr_blocks =  ["0.0.0.0/0"]
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    cidr_blocks     = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
-  vpc_id="${aws_vpc.default.id}"
+  vpc_id = aws_vpc.main.id
 
   tags = {
     Name = "Web Server SG"
@@ -120,32 +120,32 @@ resource "aws_security_group" "sg-web" {
 }
 
 # Define the security group for private subnet
-resource "aws_security_group" "sg-db"{
-  name = "sg_db"
+resource "aws_security_group" "sg-db" {
+  name        = "sg_db"
   description = "Allow traffic from public subnet"
 
   ingress {
-    from_port = 3306
-    to_port = 3306
-    protocol = "tcp"
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
     cidr_blocks = ["10.0.1.0/24"]
   }
 
   ingress {
-    from_port = -1
-    to_port = -1
-    protocol = "icmp"
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp"
     cidr_blocks = ["10.0.1.0/24"]
   }
 
   ingress {
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
     cidr_blocks = ["10.0.1.0/24"]
   }
 
-  vpc_id = "${aws_vpc.default.id}"
+  vpc_id = aws_vpc.main.id
 
   tags = {
     Name = "Database SG"
