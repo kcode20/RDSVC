@@ -73,7 +73,7 @@ resource "aws_route_table_association" "web-public-rt" {
   route_table_id = aws_route_table.web-public-rt.id
 }
 
-# Define the security group for public subnet
+# Define the security group for web server
 resource "aws_security_group" "sg-web" {
   name        = "sg_web_server"
   description = "Allow incoming HTTP connections & SSH access"
@@ -152,8 +152,23 @@ resource "aws_security_group" "sg-db" {
   }
 }
 
+# Create a key-pair for EC2 instance
+resource "aws_key_pair" "keypair"{
+  key_name = "rdsvc-ec2-keypair"
+  public_key = file("./kp/rdsvc-ec2-keypair")
+}
+
+
 # Creates an EC2 instance
 resource "aws_instance" "rdsvc-ec2" {
   ami           = "ami-2757f631"
   instance_type = "t2.micro"
+  key_name = aws_key_pair.keypair.key_name
+
+  subnet_id = aws_subnet.public_subnet.id
+  vpc_security_group_ids = aws_security_group.sg-web.id
+
+  tags = {
+    Name = "RDSVC EC2"
+  }
 }
