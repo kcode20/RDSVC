@@ -152,23 +152,16 @@ resource "aws_security_group" "sg-db" {
   }
 }
 
-# Create a key-pair for EC2 instance
-resource "aws_key_pair" "keypair"{
-  key_name = "rdsvc-ec2-keypair"
-  public_key = file("/Users/khristianbrooks/.ssh/rdsvc-ec2-keypair.pem")
-}
-
-
 # Creates an EC2 instance
 resource "aws_instance" "rdsvc-ec2" {
   ami           = "ami-00514a528eadbc95b" # Amazon Linux AMI
   instance_type = "t2.micro"
-  key_name = aws_key_pair.keypair.key_name
+  key_name      = "rdsvc-ec2-keypair"
 
-  subnet_id = aws_subnet.public-subnet.id
-  vpc_security_group_ids = [aws_security_group.sg-web.id]
+  subnet_id                   = aws_subnet.public-subnet.id
+  vpc_security_group_ids      = [aws_security_group.sg-web.id]
   associate_public_ip_address = true
-  user_data = file("userdata.sh")
+  user_data                   = file("userdata.sh")
 
   tags = {
     Name = "RDSVC EC2"
