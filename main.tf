@@ -210,6 +210,6 @@ resource "aws_s3_bucket" "rdsvc-db-backups" {
   acl    = "private"
 
   tags = {
-    Name        = "Database Backups"
+    Name = "Database Backups"
   }
 }
