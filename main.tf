@@ -47,7 +47,7 @@ resource "aws_subnet" "private-subnet-1" {
 # Define a private subnet
 resource "aws_subnet" "private-subnet-2" {
   vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.2.0/24"
+  cidr_block        = "10.0.3.0/24"
   availability_zone = "us-east-1d"
 
   tags = {
@@ -196,7 +196,7 @@ resource "aws_db_instance" "mysql-db" {
   engine                 = "mysql"
   engine_version         = "5.7"
   instance_class         = "db.t2.micro"
-  name                   = "mysql-db"
+  name                   = "mysqldb"
   username               = var.db_username
   password               = var.db_password
   parameter_group_name   = "default.mysql5.7"
