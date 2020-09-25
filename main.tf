@@ -152,7 +152,7 @@ resource "aws_security_group" "sg-db" {
   }
 }
 
-# Creates an EC2 instance
+# Creates an EC2 instance in the public subnet
 resource "aws_instance" "rdsvc-ec2" {
   ami           = "ami-00514a528eadbc95b" # Amazon Linux AMI
   instance_type = "t2.micro"
@@ -166,4 +166,29 @@ resource "aws_instance" "rdsvc-ec2" {
   tags = {
     Name = "RDSVC EC2"
   }
+}
+
+# Create an RDS DB subnet group
+resource "aws_db_subnet_group" "default" {
+  name       = "main"
+  subnet_ids = [aws_subnet.private-subnet.id]
+
+  tags = {
+    Name = "DB Subnet Group"
+  }
+}
+
+# Create an RDS instance in the private subnet
+resource "aws_db_instance" "mysql-db" {
+  allocated_storage      = 5
+  storage_type           = "gp2"
+  engine                 = "mysql"
+  engine_version         = "5.7"
+  instance_class         = "db.t2.micro"
+  name                   = "mysql-db"
+  username               = var.db_username
+  password               = var.db_password
+  parameter_group_name   = "default.mysql5.7"
+  vpc_security_group_ids = [aws_security_group.sg-db.id]
+  db_subnet_group_name   = aws_db_subnet_group.default.name
 }
