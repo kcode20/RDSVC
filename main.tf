@@ -34,13 +34,24 @@ resource "aws_subnet" "public-subnet" {
 }
 
 # Define a private subnet
-resource "aws_subnet" "private-subnet" {
+resource "aws_subnet" "private-subnet-1" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = "10.0.2.0/24"
-  availability_zone = "us-east-1c"
+  availability_zone = "us-east-1e"
 
   tags = {
-    "Name" = "Database Private Subnet"
+    "Name" = "Private Subnet 1"
+  }
+}
+
+# Define a private subnet
+resource "aws_subnet" "private-subnet-2" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.2.0/24"
+  availability_zone = "us-east-1d"
+
+  tags = {
+    "Name" = "Private Subnet 2"
   }
 }
 
@@ -171,7 +182,7 @@ resource "aws_instance" "rdsvc-ec2" {
 # Create an RDS DB subnet group
 resource "aws_db_subnet_group" "default" {
   name       = "main"
-  subnet_ids = [aws_subnet.private-subnet.id]
+  subnet_ids = [aws_subnet.private-subnet-1.id, aws_subnet.private-subnet-2.id]
 
   tags = {
     Name = "DB Subnet Group"
