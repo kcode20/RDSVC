@@ -203,3 +203,13 @@ resource "aws_db_instance" "mysql-db" {
   vpc_security_group_ids = [aws_security_group.sg-db.id]
   db_subnet_group_name   = aws_db_subnet_group.default.name
 }
+
+# Create an S3 bucket
+resource "aws_s3_bucket" "db-backups" {
+  bucket = "db-backups"
+  acl    = "private"
+
+  tags = {
+    Name        = "Database Backups"
+  }
+}
