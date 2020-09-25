@@ -205,8 +205,8 @@ resource "aws_db_instance" "mysql-db" {
 }
 
 # Create an S3 bucket
-resource "aws_s3_bucket" "db-backups" {
-  bucket = "db-backups"
+resource "aws_s3_bucket" "rdsvc-db-backups" {
+  bucket = "rdsvc-db-backups"
   acl    = "private"
 
   tags = {
