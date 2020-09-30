@@ -213,3 +213,53 @@ resource "aws_s3_bucket" "rdsvc-db-backups" {
     Name = "Database Backups"
   }
 }
+
+# Create Role for Lambda Function 
+resource "aws_iam_role" "lambda-role" {
+  name               = "rdsvc-lambda-role"
+  assume_role_policy = <<EOF
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Action": ["rds:*", "s3:*"],
+          "Effect": "Allow",
+          "Resource": "*"
+        }
+      ]
+    }
+  EOF
+
+  tags = {
+    Name = "rdsvc-lambda-role"
+  }
+}
+
+# Create Lambda Function
+resource "aws_lambda_function" "rdsvc-lambda-function" {
+  function_name = "rdsvc-lambda-function"
+  filename      = "rdsvc-lambda-package.zip"
+  handler       = "lambda.create_backup"
+  role          = aws_iam_role.lambda-role.arn
+  runtime       = "python3.7"
+
+  environment {
+    variables = {
+      MYSQL_DB   = aws_db_instance.mysql-db.name
+      MYSQL_HOST = aws_db_instance.mysql-db.endpoint
+      MYSQL_PORT = aws_db_instance.mysql-db.port
+      MYSQL_USER = aws_db_instance.mysql-db.username
+      MYSQL_PASS = var.db_password
+      S3_BUCKET  = aws_s3_bucket.rdsvc-db-backups.id
+    }
+  }
+
+  vpc_config {
+    security_group_ids = [aws_security_group.sg-db.id]
+    subnet_ids         = [aws_subnet.private-subnet-1.id, aws_subnet.private-subnet-2.id]
+  }
+
+  tags = {
+    Name = "rdsvc-lambda-function"
+  }
+}
