@@ -222,9 +222,12 @@ resource "aws_iam_role" "lambda-role" {
       "Version": "2012-10-17",
       "Statement": [
         {
-          "Action": ["rds:*", "s3:*"],
+          "Action": "sts:AssumeRole",
+          "Principal": {
+            "Service": "ec2.amazonaws.com"
+          },
           "Effect": "Allow",
-          "Resource": "*"
+          "Sid": ""
         }
       ]
     }
@@ -233,6 +236,35 @@ resource "aws_iam_role" "lambda-role" {
   tags = {
     Name = "rdsvc-lambda-role"
   }
+}
+
+# Create IAM Policy
+resource "aws_iam_policy" "rdsvc-lambda-policy" {
+  name        = "rdsvc-lambda-policy"
+  description = "A policy for the rdsvc lambda"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "ec2:*", 
+        "rds:*",
+        "s3:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
+# Attach policy to role
+resource "aws_iam_role_policy_attachment" "lambda-role-policy-attachment" {
+  policy_arn = aws_iam_policy.rdsvc-lambda-policy.arn
+  role       = aws_iam_role.lambda-role.name
 }
 
 # Create Lambda Function
