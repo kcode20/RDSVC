@@ -218,20 +218,20 @@ resource "aws_s3_bucket" "rdsvc-db-backups" {
 resource "aws_iam_role" "lambda-role" {
   name               = "rdsvc-lambda-role"
   assume_role_policy = <<EOF
-    {
-      "Version": "2012-10-17",
-      "Statement": [
-        {
-          "Action": "sts:AssumeRole",
-          "Principal": {
-            "Service": "ec2.amazonaws.com"
-          },
-          "Effect": "Allow",
-          "Sid": ""
-        }
-      ]
-    }
-  EOF
+{
+"Version": "2012-10-17",
+"Statement": [
+{
+"Action": "sts:AssumeRole",
+"Principal": {
+"Service": "lambda.amazonaws.com"
+},
+"Effect": "Allow",
+"Sid": ""
+}
+]
+}
+EOF
 
   tags = {
     Name = "rdsvc-lambda-role"
@@ -270,10 +270,11 @@ resource "aws_iam_role_policy_attachment" "lambda-role-policy-attachment" {
 # Create Lambda Function
 resource "aws_lambda_function" "rdsvc-lambda-function" {
   function_name = "rdsvc-lambda-function"
-  filename      = "rdsvc-lambda-package.zip"
-  handler       = "lambda.create_backup"
+  filename      = "rdsvc-lambda.zip"
+  handler       = "rdsvc-lambda.lambda.create_backup"
   role          = aws_iam_role.lambda-role.arn
   runtime       = "python3.7"
+  timeout       = 100
 
   environment {
     variables = {

@@ -11,5 +11,6 @@ def create_backup(event, context):
     # Set the path to the executable script in the AWS Lambda environment
     # Source: https://aws.amazon.com/blogs/compute/running-executables-in-aws-lambda/
     os.environ['PATH'] = os.environ['PATH'] + ':' + os.environ['LAMBDA_TASK_ROOT']
-    subprocess.check_call(["cp ./backup.sh /tmp/backup.sh && chmod 755 /tmp/backup.sh"], shell=True)
-    subprocess.check_call(["./backup.sh", os.environ['MYSQL_HOST'], os.environ['MYSQL_PORT'], os.environ['MYSQL_USER'], os.environ['MYSQL_PASS'], os.environ['MYSQL_DB'], os.environ['S3_BUCKET']])
+    THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
+    backup_file = os.path.join(THIS_FOLDER, 'backup.sh')
+    subprocess.check_call([backup_file, os.environ['MYSQL_HOST'], os.environ['MYSQL_PORT'], os.environ['MYSQL_USER'], os.environ['MYSQL_PASS'], os.environ['MYSQL_DB'], os.environ['S3_BUCKET']])

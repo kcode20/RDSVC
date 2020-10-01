@@ -8,12 +8,11 @@ MYSQL_PASS=$4
 MYSQL_DB=$5
 S3_BUCKET=$6
 
-# make sure mysqldump is accessible in /tmp
-cp ./mysqldump /tmp/mysqldump
-chmod 755 /tmp/mysqldump
-
 # Move into /tmp
 cd /tmp
+
+# make sure mysql is installed
+yum install mysql
 
 # Define file for mysqldump output
 file=$(date +%F).sql
