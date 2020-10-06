@@ -298,7 +298,7 @@ resource "aws_lambda_function" "rdsvc-lambda-function" {
 }
 
 # Create VPC Endpoint
-resource "aws_vpc_endpoint" "saints-xctf-s3-vpc-endpoint" {
+resource "aws_vpc_endpoint" "rdsvc-vpc-endpoint" {
   service_name      = "com.amazonaws.us-east-1.s3"
   vpc_endpoint_type = "Gateway"
 
