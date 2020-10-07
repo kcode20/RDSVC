@@ -271,8 +271,8 @@ resource "aws_iam_role_policy_attachment" "lambda-role-policy-attachment" {
 # Create Lambda Function
 resource "aws_lambda_function" "rdsvc-lambda-function" {
   function_name = "rdsvc-lambda-function"
-  filename      = "rdsvc-lambda.zip"
-  handler       = "rdsvc-lambda.lambda.create_backup"
+  filename      = "rdsvc-lambda-package.zip"
+  handler       = "rdsvc-lambda-package.lambda.create_backup"
   role          = aws_iam_role.lambda-role.arn
   runtime       = "python3.7"
   timeout       = 100
@@ -280,7 +280,7 @@ resource "aws_lambda_function" "rdsvc-lambda-function" {
   environment {
     variables = {
       MYSQL_DB   = aws_db_instance.mysql-db.name
-      MYSQL_HOST = aws_db_instance.mysql-db.endpoint
+      MYSQL_HOST = aws_db_instance.mysql-db.address
       MYSQL_PORT = aws_db_instance.mysql-db.port
       MYSQL_USER = aws_db_instance.mysql-db.username
       MYSQL_PASS = var.db_password
@@ -289,8 +289,8 @@ resource "aws_lambda_function" "rdsvc-lambda-function" {
   }
 
   vpc_config {
-    security_group_ids = [aws_security_group.sg-db.id]
-    subnet_ids         = [aws_subnet.private-subnet-1.id, aws_subnet.private-subnet-2.id]
+    security_group_ids = [aws_security_group.sg-web.id]
+    subnet_ids         = [aws_subnet.public-subnet.id]
   }
 
   tags = {
@@ -300,12 +300,9 @@ resource "aws_lambda_function" "rdsvc-lambda-function" {
 
 # Create VPC Endpoint
 resource "aws_vpc_endpoint" "rdsvc-vpc-endpoint" {
+  vpc_id            = aws_vpc.main.id
   service_name      = "com.amazonaws.us-east-1.s3"
   vpc_endpoint_type = "Gateway"
-
-  vpc_id     = aws_vpc.main.id
-  subnet_ids = [aws_subnet.private-subnet-1.id, aws_subnet.private-subnet-2.id]
-
 
   route_table_ids = [aws_route_table.web-public-rt.id]
 }

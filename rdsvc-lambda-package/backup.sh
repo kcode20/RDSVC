@@ -8,7 +8,7 @@ MYSQL_PASS=$4
 MYSQL_DB=$5
 S3_BUCKET=$6
 
-cp "./rdsvc-lambda/mysqldump" /tmp/mysqldump
+cp "./rdsvc-lambda-package/mysqldump" /tmp/mysqldump
 chmod 755 /tmp/mysqldump
 
 # Define file for mysqldump output
