@@ -306,3 +306,30 @@ resource "aws_vpc_endpoint" "rdsvc-vpc-endpoint" {
 
   route_table_ids = [aws_route_table.web-public-rt.id]
 }
+
+# Create Cloudwatch Event Rule
+resource "aws_cloudwatch_event_rule" "lambda-function-schedule-rule" {
+  name                = "rdsvc-backup-lambda-rule"
+  description         = "Execute the Lambda Function Daily at 7am"
+  schedule_expression = "cron(0 7 * * ? *)"
+  is_enabled          = true
+
+  tags = {
+    Name = "rdsvc-backup-lambda-rule"
+  }
+}
+
+# Provide Cloudwatch event target resource
+resource "aws_cloudwatch_event_target" "lambda-function-schedule-target" {
+  arn  = aws_lambda_function.rdsvc-lambda-function.arn
+  rule = aws_cloudwatch_event_rule.lambda-function-schedule-rule.name
+}
+
+# Give Cloudwatch permission to access lambda
+resource "aws_lambda_permission" "lambda-function-schedule-permission" {
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.rdsvc-lambda-function.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.lambda-function-schedule-rule.arn
+}
