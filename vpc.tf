@@ -1,3 +1,8 @@
+/*
+This file creates the virtual private cloud.
+It defines the public/private subnets, internet gateway, and route tables.
+*/
+
 # Define a VPC
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"

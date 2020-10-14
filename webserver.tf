@@ -1,3 +1,8 @@
+/*
+This file creates the webserver that lives in the public subnet.
+It defines the security group and EC2 instance.
+*/
+
 # Define the security group for web server
 resource "aws_security_group" "sg-web" {
   name        = "sg_web_server"

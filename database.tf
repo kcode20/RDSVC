@@ -1,3 +1,8 @@
+/*
+This file creates the database that lives in the private subnet.
+It defines the security group, database subnet group, and RDS instance.
+*/
+
 # Define the security group for private subnet
 resource "aws_security_group" "sg-db" {
   name        = "sg_db"
@@ -55,4 +60,3 @@ resource "aws_db_instance" "mysql-db" {
   vpc_security_group_ids = [aws_security_group.sg-db.id]
   db_subnet_group_name   = aws_db_subnet_group.default.name
 }
-

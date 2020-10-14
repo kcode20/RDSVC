@@ -1,3 +1,8 @@
+/*
+This file creates a lambda function responsible for backing up the RDS database.
+It defines the role, IAM policy, triggers, and function.
+*/
+
 # Create Role for Lambda Function 
 resource "aws_iam_role" "lambda-role" {
   name               = "rdsvc-lambda-role"
