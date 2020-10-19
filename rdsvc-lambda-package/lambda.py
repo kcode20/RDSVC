@@ -9,7 +9,9 @@ from botocore.exceptions import ClientError
 def create_backup(event, context):
     """
     Create a backup of an RDS MySQL database and store it on S3.
-
+    :param event: provides information about the triggering of the function
+    :param context: provides information about the execution environment
+    :return: True when successful
     """
     host = os.environ['MYSQL_HOST']
     port = os.environ['MYSQL_PORT']

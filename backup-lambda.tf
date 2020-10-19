@@ -67,7 +67,7 @@ resource "aws_lambda_function" "rdsvc-lambda-function" {
 
   environment {
     variables = {
-      MYSQL_DB   = aws_db_instance.mysql-db.name
+      MYSQL_DB   = "OSMI"
       MYSQL_HOST = aws_db_instance.mysql-db.address
       MYSQL_PORT = aws_db_instance.mysql-db.port
       MYSQL_USER = aws_db_instance.mysql-db.username
